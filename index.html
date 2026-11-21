@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9の法則・熱傷体表面積推定ツール</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-orange-950 min-h-screen p-4">
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold text-orange-200 text-center mb-1">9の法則・熱傷体表面積ツール</h1>
+  <p class="text-orange-400 text-center text-sm mb-4">Wallace Rule of Nines — TBSA(%)</p>
+
+  <div class="bg-orange-900 rounded-2xl p-4 mb-4 text-center">
+    <div class="text-orange-400 text-sm mb-1">熱傷体表面積（TBSA）</div>
+    <div id="tbsa-display" class="text-5xl font-bold text-white">0%</div>
+    <div id="severity-label" class="text-orange-400 text-sm mt-1"></div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mb-4">
+    <!-- Front body -->
+    <div class="bg-orange-900 rounded-xl p-3">
+      <h3 class="text-orange-200 font-bold text-sm mb-3 text-center">前面</h3>
+      <div class="space-y-2">
+        <div id="btn-head-front" onclick="toggleRegion('head')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div class="text-lg">🫨</div>
+          <div>頭部・頸部</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-chest-front" onclick="toggleRegion('chest')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div class="text-lg">🫁</div>
+          <div>胸部（前面）</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-abdomen-front" onclick="toggleRegion('abdomen')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div class="text-lg">🫃</div>
+          <div>腹部（前面）</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-arm-right" onclick="toggleRegion('arm-right')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>右上肢</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-arm-left" onclick="toggleRegion('arm-left')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>左上肢</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-genitalia" onclick="toggleRegion('genitalia')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>会陰部</div>
+          <div class="text-xs text-orange-400">1%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back body -->
+    <div class="bg-orange-900 rounded-xl p-3">
+      <h3 class="text-orange-200 font-bold text-sm mb-3 text-center">後面</h3>
+      <div class="space-y-2">
+        <div id="btn-back-upper" onclick="toggleRegion('back-upper')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>背部上半</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-back-lower" onclick="toggleRegion('back-lower')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>背部下半・臀部</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-leg-right-front" onclick="toggleRegion('leg-right-front')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>右下肢（前面）</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-leg-left-front" onclick="toggleRegion('leg-left-front')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>左下肢（前面）</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-leg-right-back" onclick="toggleRegion('leg-right-back')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>右下肢（後面）</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+        <div id="btn-leg-left-back" onclick="toggleRegion('leg-left-back')" class="cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none">
+          <div>左下肢（後面）</div>
+          <div class="text-xs text-orange-400">9%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="resetAll()" class="w-full bg-orange-800 hover:bg-orange-700 text-orange-300 py-2 rounded-xl mb-4">リセット</button>
+
+  <div class="bg-orange-900 rounded-xl p-4 text-sm">
+    <h3 class="text-orange-200 font-bold mb-2">小児補正（Lund-Browder簡易参考）</h3>
+    <div class="text-orange-400 text-xs space-y-1">
+      <p>• 小児は頭部が体表面積に占める割合が大きい（新生児:19%, 1歳:17%, 5歳:13%）</p>
+      <p>• 小児は下肢の割合が小さい（新生児:各14%, 成人は各18%）</p>
+      <p>• 正確な評価はLund-Browderチャートを使用</p>
+    </div>
+    <h3 class="text-orange-200 font-bold mt-3 mb-1">重症度（成人）</h3>
+    <div class="grid grid-cols-3 gap-1 text-xs">
+      <div class="bg-yellow-900 text-yellow-300 rounded p-1 text-center">軽症: &lt;10%</div>
+      <div class="bg-orange-800 text-orange-300 rounded p-1 text-center">中等症: 10〜25%</div>
+      <div class="bg-red-900 text-red-300 rounded p-1 text-center">重症: &gt;25%</div>
+    </div>
+  </div>
+  <p class="text-orange-700 text-xs text-center mt-2">※本ツールは医学教育目的です。救急現場では専門職が判断してください。</p>
+</div>
+
+<script>
+const regions = {
+  'head':          { pct:9,  btn:'btn-head-front' },
+  'chest':         { pct:9,  btn:'btn-chest-front' },
+  'abdomen':       { pct:9,  btn:'btn-abdomen-front' },
+  'back-upper':    { pct:9,  btn:'btn-back-upper' },
+  'back-lower':    { pct:9,  btn:'btn-back-lower' },
+  'arm-right':     { pct:9,  btn:'btn-arm-right' },
+  'arm-left':      { pct:9,  btn:'btn-arm-left' },
+  'leg-right-front':{ pct:9, btn:'btn-leg-right-front' },
+  'leg-left-front':{ pct:9,  btn:'btn-leg-left-front' },
+  'leg-right-back':{ pct:9,  btn:'btn-leg-right-back' },
+  'leg-left-back': { pct:9,  btn:'btn-leg-left-back' },
+  'genitalia':     { pct:1,  btn:'btn-genitalia' },
+};
+
+const burned = new Set();
+
+function toggleRegion(id) {
+  if (burned.has(id)) burned.delete(id);
+  else burned.add(id);
+  updateDisplay();
+}
+
+function updateDisplay() {
+  let total = 0;
+  Object.entries(regions).forEach(([id, r]) => {
+    const btn = document.getElementById(r.btn);
+    if (burned.has(id)) {
+      total += r.pct;
+      btn.className = 'cursor-pointer rounded-lg p-2 text-center text-sm bg-red-700 text-white transition select-none border-2 border-red-400';
+    } else {
+      btn.className = 'cursor-pointer rounded-lg p-2 text-center text-sm bg-orange-800 hover:bg-orange-700 transition select-none';
+    }
+  });
+  document.getElementById('tbsa-display').textContent = total + '%';
+
+  let sev, cls;
+  if (total === 0) { sev = ''; cls = 'text-orange-400'; }
+  else if (total < 10) { sev = '軽症'; cls = 'text-yellow-400'; }
+  else if (total <= 25) { sev = '中等症 — 入院治療を要する'; cls = 'text-orange-400'; }
+  else if (total <= 50) { sev = '重症 — 専門熱傷センターへ'; cls = 'text-red-400'; }
+  else { sev = '最重症 — 生命の危機'; cls = 'text-red-300'; }
+  document.getElementById('severity-label').textContent = sev;
+  document.getElementById('severity-label').className = 'text-sm mt-1 ' + cls;
+}
+
+function resetAll() {
+  burned.clear();
+  updateDisplay();
+}
+</script>
+</body>
+</html>
